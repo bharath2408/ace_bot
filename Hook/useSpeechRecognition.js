@@ -80,6 +80,8 @@ export function useSpeechRecognition() {
     if (!browserSupportsSpeechRecognition || !recognitionRef.current) return;
 
     recognitionRef.current.stop();
+    recognitionRef.current.abort(); // Forcefully stop if needed
+    recognitionRef.current = null;
     setIsListening(false);
   }, [browserSupportsSpeechRecognition]);
 
@@ -87,6 +89,7 @@ export function useSpeechRecognition() {
     isListening,
     transcript: finalTranscript,
     startListening,
+    recognitionRef,
     stopListening,
     browserSupportsSpeechRecognition,
   };

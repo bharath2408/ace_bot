@@ -121,6 +121,7 @@ export default function Component({ params }) {
     transcript,
     startListening,
     stopListening,
+    recognitionRef,
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
@@ -1385,8 +1386,16 @@ export default function Component({ params }) {
                                           </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                          {message?.compare?.differences.map(
-                                            (diff, index) => (
+                                          {message?.compare?.differences
+                                            .filter(
+                                              (diff) =>
+                                                ![
+                                                  "overview",
+                                                  "image_urls",
+                                                  "product_urls",
+                                                ].includes(diff.field_name)
+                                            )
+                                            .map((diff, index) => (
                                               <TableRow
                                                 key={index}
                                                 className={
@@ -1410,8 +1419,7 @@ export default function Component({ params }) {
                                                   </TableCell>
                                                 ))}
                                               </TableRow>
-                                            )
-                                          )}
+                                            ))}
                                         </TableBody>
                                       </Table>
                                     </ScrollArea>
