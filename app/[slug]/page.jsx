@@ -109,6 +109,7 @@ export default function Component({ params }) {
 
   const [botExpand, setBotExpand] = useState(false);
   const [expandedItems, setExpandedItems] = useState([]);
+  const [accessoriesItems, setAccessoriesItems] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [question1Answer, setQuestion1Answer] = useState("");
   const [question2Answer, setQuestion2Answer] = useState("");
@@ -199,7 +200,7 @@ export default function Component({ params }) {
     try {
       // Make the POST request using axios
       const response = await axios.post(
-        "https://langgraph-chat-eehaf0gxgehcadfr.eastus2-01.azurewebsites.net/chatbot",
+        "https://ace-chat-bot.azurewebsites.net/chatbot",
         {
           part_number: { current_product: params?.slug },
           messages: params?.slug,
@@ -261,6 +262,12 @@ export default function Component({ params }) {
     }
   };
 
+  const getRandomItems = (accessories, count = 3) => {
+    if (!Array.isArray(accessories)) return [];
+    const shuffled = [...accessories].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
   const handleTypeMessage = async (usertext) => {
     if (usertext.trim() === "") return;
     const newUserMessage = {
@@ -279,7 +286,7 @@ export default function Component({ params }) {
     try {
       // Make the POST request using axios
       const response = await axios.post(
-        "https://langgraph-chat-eehaf0gxgehcadfr.eastus2-01.azurewebsites.net/chatbot",
+        "https://ace-chat-bot.azurewebsites.net/chatbot",
         {
           part_number: { current_product: params?.slug },
           messages: imageBase64
@@ -391,7 +398,7 @@ export default function Component({ params }) {
                       ? result.suggestion
                       : [],
                     accessories: Array.isArray(result?.accessories)
-                      ? result?.accessories
+                      ? getRandomItems(result?.accessories)
                       : [],
                     compareInputValue: {
                       item_number_match:
@@ -448,7 +455,7 @@ export default function Component({ params }) {
       try {
         // Make the POST request using axios
         const response = await axios.post(
-          "https://langgraph-chat-eehaf0gxgehcadfr.eastus2-01.azurewebsites.net/chatbot",
+          "https://ace-chat-bot.azurewebsites.net/chatbot",
           {
             part_number: { current_product: params?.slug },
             messages: params?.slug,
@@ -487,7 +494,7 @@ export default function Component({ params }) {
       setLoading(true);
       // Make the POST request using axios
       const response = await axios.post(
-        "https://langgraph-chat-eehaf0gxgehcadfr.eastus2-01.azurewebsites.net/chatbot",
+        "https://ace-chat-bot.azurewebsites.net/chatbot",
         {
           part_number: { current_product: params?.slug },
           messages: "compare " + selectedItemsString,
@@ -582,6 +589,13 @@ export default function Component({ params }) {
     }));
   };
 
+  const handleAccessoriesToggle = (index) => {
+    setAccessoriesItems((prevExpandedItems) => ({
+      ...prevExpandedItems,
+      [index]: !prevExpandedItems[index], // Toggle the current item's expanded state
+    }));
+  };
+
   const handleQuestionAnswer = (questionNumber, answer) => {
     if (questionNumber === 1) {
       const selectedItemsString = selectedItems.join(", ");
@@ -618,8 +632,6 @@ export default function Component({ params }) {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize first char of each word
       .join(" ");
   }
-
-  console.log(messages);
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -661,13 +673,6 @@ export default function Component({ params }) {
     } else {
       startListening();
     }
-  };
-
-  const getRandomItems = (accessories, count = 3) => {
-    if (!Array.isArray(accessories)) return [];
-    const shuffled = [...accessories].sort(() => 0.5 - Math.random());
-    console.log(shuffled);
-    return shuffled.slice(0, count);
   };
 
   return (
@@ -885,9 +890,9 @@ export default function Component({ params }) {
                   >
                     {messages.map((message, index) => {
                       const isLastMessage = index === messages.length - 1;
-                      const displayedItems = getRandomItems(
-                        message?.accessories
-                      );
+                      // const displayedItems = getRandomItems(
+                      //   message?.accessories
+                      // );
                       return (
                         <div
                           key={message.id}
@@ -918,83 +923,87 @@ export default function Component({ params }) {
                               {message?.accessories?.length > 0 && (
                                 <>
                                   <div className="relative grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 p-1">
-                                    {displayedItems?.map((product, index) => (
-                                      <Card
-                                        key={index}
-                                        className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-full flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
-                                      >
-                                        <CardHeader className="p-2 bg-[#d40029]">
-                                          <div className="flex justify-between items-start">
-                                            <CardTitle className="text-sm font-bold text-white truncate max-w-full">
-                                              {product.name
-                                                .charAt(0)
-                                                .toUpperCase() +
-                                                product.name.slice(1)}
-                                            </CardTitle>
-                                          </div>
-                                        </CardHeader>
-                                        <CardContent className="p-2 flex-grow">
-                                          <div className="flex items-center mb-2">
-                                            <Tag className="w-4 h-4 mr-2 text-blue-500" />
-                                            <CardDescription className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                                              Item No:{" "}
-                                              <span className="uppercase">
-                                                {product.item_number}
-                                              </span>
-                                            </CardDescription>
-                                          </div>
-                                          <div className="mb-4">
-                                            <div className="flex items-center mb-1">
-                                              <Info className="w-4 h-4 mr-2 text-blue-500" />
-                                              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                                Overview
-                                              </h3>
+                                    {message?.accessories?.map(
+                                      (product, index) => (
+                                        <Card
+                                          key={index}
+                                          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-full flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
+                                        >
+                                          <CardHeader className="p-2 bg-[#d40029]">
+                                            <div className="flex justify-between items-start">
+                                              <CardTitle className="text-sm font-bold text-white truncate max-w-full">
+                                                {product.name
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                                  product.name.slice(1)}
+                                              </CardTitle>
                                             </div>
-                                            <p
-                                              className={`text-sm text-gray-700 dark:text-gray-200 ${
-                                                expandedItems[index]
-                                                  ? ""
-                                                  : "line-clamp-3"
-                                              }`}
-                                            >
-                                              {capitalizeFirstLetter(
-                                                product?.overview
-                                              )}
-                                            </p>
-                                            {product?.overview?.length >
-                                              150 && (
-                                              <Button
-                                                variant="link"
-                                                onClick={() =>
-                                                  handleExpandToggle(index)
-                                                }
-                                                className="mt-1 p-0 h-auto text-[#d40029] hover:text-[#d40029]"
+                                          </CardHeader>
+                                          <CardContent className="p-2 flex-grow">
+                                            <div className="flex items-center mb-2">
+                                              <Tag className="w-4 h-4 mr-2 text-blue-500" />
+                                              <CardDescription className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                                Item No:{" "}
+                                                <span className="uppercase">
+                                                  {product.item_number}
+                                                </span>
+                                              </CardDescription>
+                                            </div>
+                                            <div className="mb-4">
+                                              <div className="flex items-center mb-1">
+                                                <Info className="w-4 h-4 mr-2 text-blue-500" />
+                                                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                  Overview
+                                                </h3>
+                                              </div>
+                                              <p
+                                                className={`text-sm text-gray-700 dark:text-gray-200 ${
+                                                  accessoriesItems[index]
+                                                    ? ""
+                                                    : "line-clamp-3"
+                                                }`}
                                               >
-                                                {expandedItems[index]
-                                                  ? "Show less"
-                                                  : "Show more"}
-                                              </Button>
-                                            )}
-                                          </div>
-                                        </CardContent>
-                                        <CardFooter className="p-1 bg-gray-50 dark:bg-gray-700">
-                                          <Button
-                                            asChild
-                                            variant="ghost"
-                                            className="w-full justify-between hover:bg-blue-100 dark:hover:bg-blue-900"
-                                          >
-                                            <Link
-                                              href={`/${product.item_number}`}
-                                              target="_blank"
-                                              className="flex items-center"
+                                                {capitalizeFirstLetter(
+                                                  product?.overview
+                                                )}
+                                              </p>
+                                              {product?.overview?.length >
+                                                150 && (
+                                                <Button
+                                                  variant="link"
+                                                  onClick={() =>
+                                                    handleAccessoriesToggle(
+                                                      index
+                                                    )
+                                                  }
+                                                  className="mt-1 p-0 h-auto text-[#d40029] hover:text-[#d40029]"
+                                                >
+                                                  {accessoriesItems[index]
+                                                    ? "Show less"
+                                                    : "Show more"}
+                                                </Button>
+                                              )}
+                                            </div>
+                                          </CardContent>
+                                          <CardFooter className="p-1 bg-gray-50 dark:bg-gray-700">
+                                            <Button
+                                              asChild
+                                              variant="ghost"
+                                              className="w-full justify-between hover:bg-blue-100 dark:hover:bg-blue-900"
                                             >
-                                              <span>View Details</span>
-                                              <ExternalLink className="w-4 h-4 ml-2" />
-                                            </Link>
-                                          </Button>
-                                        </CardFooter>
-                                      </Card>
-                                    ))}
+                                              <Link
+                                                href={`/${product.item_number}`}
+                                                target="_blank"
+                                                className="flex items-center"
+                                              >
+                                                <span>View Details</span>
+                                                <ExternalLink className="w-4 h-4 ml-2" />
+                                              </Link>
+                                            </Button>
+                                          </CardFooter>
+                                        </Card>
+                                      )
+                                    )}
                                   </div>
                                 </>
                               )}
