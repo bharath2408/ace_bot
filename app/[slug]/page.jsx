@@ -1128,7 +1128,7 @@ export default function Component({ params }) {
                                             key={index}
                                             className="bg-white dark:bg-gray-800 rounded-lg shadow-lg h-full flex flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
                                           >
-                                            <CardHeader className="p-2 bg-gradient-to-r from-blue-500 to-blue-600">
+                                            <CardHeader className="p-2 bg-[#d40029]">
                                               <div className="flex justify-between items-start">
                                                 <CardTitle className="text-sm font-bold text-white truncate max-w-full">
                                                   {product.title
@@ -1199,7 +1199,7 @@ export default function Component({ params }) {
                                                   key={valIndex}
                                                   className="flex mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex-col overflow-hidden border border-gray-200 dark:border-gray-700"
                                                 >
-                                                  <CardHeader className="p-2 bg-gradient-to-r from-blue-500 to-blue-600">
+                                                  <CardHeader className="p-2 bg-[#d40029]">
                                                     <div className="flex justify-between items-start">
                                                       <CardTitle className="text-sm font-bold text-white truncate max-w-full">
                                                         {product?.name
